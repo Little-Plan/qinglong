@@ -11,7 +11,7 @@ export function runCron(cmd: string): Promise<number> {
 
       cp.stderr.on('data', (data) => {
         Logger.info(
-          '[执行任务失败] %s，时间：%s, 错误信息：%j',
+          '[执行任务失败] %s, 时间: %s, 错误信息: %j',
           cmd,
           new Date().toLocaleString(),
           data.toString(),
@@ -19,7 +19,7 @@ export function runCron(cmd: string): Promise<number> {
       });
       cp.on('error', (err) => {
         Logger.error(
-          '[创建任务失败] %s，时间：%s, 错误信息：%j',
+          '[创建任务失败] %s, 时间: %s, 错误信息: %j',
           cmd,
           new Date().toLocaleString(),
           err,
@@ -27,7 +27,7 @@ export function runCron(cmd: string): Promise<number> {
       });
 
       cp.on('close', async (code) => {
-        Logger.info(`[任务退出] ${cmd} 进程id: ${cp.pid} 退出，退出码 ${code}`);
+        Logger.info(`[任务退出] ${cmd} 进程id: ${cp.pid} 退出, 退出码 ${code}`);
         resolve();
       });
     });

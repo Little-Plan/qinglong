@@ -21,11 +21,13 @@ import {
   parseContentVersion,
   parseVersion,
   promiseExec,
+  readDirs,
 } from '../config/util';
 import { TASK_COMMAND } from '../config/const';
 import taskLimit from '../shared/pLimit';
 import tar from 'tar';
 import path from 'path';
+import fs from 'fs'
 
 @Service()
 export default class SystemService {
@@ -36,7 +38,7 @@ export default class SystemService {
     @Inject('logger') private logger: winston.Logger,
     private scheduleService: ScheduleService,
     private sockService: SockService,
-  ) {}
+  ) { }
 
   public async getSystemConfig() {
     const doc = await this.getDb({ type: AuthDataType.systemConfig });
@@ -111,7 +113,7 @@ export default class SystemService {
           },
         );
         lastVersionContent = await parseContentVersion(result.body);
-      } catch (error) {}
+      } catch (error) { }
 
       if (!lastVersionContent) {
         lastVersionContent = currentVersionContent;
@@ -273,6 +275,15 @@ export default class SystemService {
       return { code: 200 };
     } catch (error: any) {
       return { code: 400, message: error.message };
+    }
+  }
+
+  public async getSystemLog(res: Response) {
+    const result = readDirs(config.systemLogPath, config.systemLogPath);
+    const logs = result.reverse().filter(x => x.title.endsWith('.log'));
+    for (const log of logs) {
+      const filePath = path.join(config.systemLogPath, log.title);
+      fs.createReadStream(filePath).pipe(res);
     }
   }
 }
